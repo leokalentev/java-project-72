@@ -19,7 +19,8 @@ jobs:
           distribution: "temurin"
 
       - name: Grant execute permission for gradlew
-        run: chmod +x app/gradlew
+        run: chmod +x gradlew
+        working-directory: app
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v3
@@ -30,5 +31,8 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew build sonar --info
         working-directory: app
-        run: ./app/gradlew build sonar --info
+
+      - name: Clear Gradle cache
+        run: rm -rf ~/.gradle
