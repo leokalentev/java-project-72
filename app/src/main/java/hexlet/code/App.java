@@ -6,7 +6,7 @@ public class App {
 
     public static void main(String[] args) {
         var app = getApp();
-        app.start(700);
+        app.start(7070);
     }
     public static Javalin getApp() {
         Javalin app = Javalin.create(config -> {

@@ -2,6 +2,7 @@ plugins {
     id("java")
     id("org.sonarqube") version "6.0.1.5171"
     application
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "hexlet.code"
@@ -24,6 +25,10 @@ dependencies {
     implementation("gg.jte:jte:3.1.9")
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("com.h2database:h2:2.2.224")
+    implementation("org.projectlombok:lombok:1.18.30")
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
 }
 
 tasks.test {
@@ -37,3 +42,21 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
     }
 }
+
+tasks.jar {
+    manifest {
+        attributes(
+            "Main-Class" to application.mainClass.get()
+        )
+    }
+}
+
+tasks.shadowJar {
+    manifest {
+        attributes(
+            "Main-Class" to application.mainClass.get()
+        )
+    }
+}
+
+
