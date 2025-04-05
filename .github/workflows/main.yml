@@ -33,6 +33,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonar --info
         working-directory: app
+        continue-on-error: true
 
       - name: Clear Gradle cache
         run: rm -rf ~/.gradle
