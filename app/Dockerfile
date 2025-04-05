@@ -2,15 +2,11 @@ FROM gradle:8.5.0-jdk21
 
 WORKDIR /app
 
-COPY gradle gradle
 COPY build.gradle.kts .
 COPY settings.gradle.kts .
-COPY gradlew .
+COPY src ./src
 
 RUN ./gradlew --no-daemon dependencies
-
-COPY src src
-COPY config config
 
 RUN ./gradlew --no-daemon build
 
