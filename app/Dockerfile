@@ -2,7 +2,7 @@ FROM gradle:8.5.0-jdk21
 
 WORKDIR /app
 
-COPY . /app
+COPY app/ /app/
 
 RUN gradle clean build
 
