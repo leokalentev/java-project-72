@@ -2,9 +2,16 @@ FROM gradle:8.5.0-jdk21
 
 WORKDIR /app
 
-COPY build.gradle settings.gradle ./
-COPY src ./src
+COPY gradle gradle
+COPY build.gradle.kts .
+COPY settings.gradle.kts .
+COPY gradlew .
 
-RUN gradle clean build --no-daemon --stacktrace
+RUN ./gradlew --no-daemon dependencies
+
+COPY src src
+COPY config config
+
+RUN ./gradlew --no-daemon build
 
 CMD ["java", "-jar", "build/libs/app-1.0-SNAPSHOT-all.jar", "--port=7070"]
