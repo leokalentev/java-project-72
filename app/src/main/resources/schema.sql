@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS urls;
 
-CREATE TABEL urls(
+CREATE TABLE urls(
      id LONG PRIMARY KEY AUTO_INCREMENT,
      name VARCHAR(255) NOT NULL,
-      created_at TIMESTAMP
+     created_at TIMESTAMP
 );

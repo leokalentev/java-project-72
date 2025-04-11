@@ -1,19 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Анализатор страниц</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous"
-    />
-  </head>
-  <body>
-    <div>
-      <p>Hello World!</p>
-    </div>
-  </body>
-</html>
+@import hexlet.code.dto.BasePage
+@import hexlet.code.dto.urls.BuildUrlPage
+@param BuildUrlPage page
+
+@template.layout.page(
+    content = @`
+        @if(page.getFlash() != null)
+            <div class="alert">
+                ${page.getFlash()}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+         @if(page.getErrors() != null)
+            <div class="mb-3">
+                <ul>
+                    @for(var validator : page.getErrors().values())
+                        @for(var error : validator)
+                            <li>${error.getMessage()}</li>
+                        @endfor
+                    @endfor
+                </ul>
+            </div>
+         @endif
+
+        <div>
+            <form action="/urls" method="post">
+                <input type="text" placeholder="https://example.com" id="url-input" name="url">
+                <label for="url-input">Ссылка</label>
+            </form>
+        </div>
+        <div>
+            <a href="/urls">Добавленные сайты</a>
+        </div>
+    `
+)
