@@ -3,6 +3,8 @@ plugins {
     id("org.sonarqube") version "6.0.1.5171"
     application
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    checkstyle
+    id("jacoco")
 }
 
 group = "hexlet.code"
@@ -73,6 +75,25 @@ sourceSets {
         }
     }
 }
+
+jacoco {
+    toolVersion = "0.8.7"
+}
+
+tasks.test {
+    useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+        html.required.set(true)
+    }
+}
+
 
 
 
