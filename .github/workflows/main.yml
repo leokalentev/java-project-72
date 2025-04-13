@@ -43,5 +43,6 @@ jobs:
           coverageCommand: ./gradlew jacocoTestReport
           coverageLocations: ${{ github.workspace }}/app/build/reports/jacoco/test/jacocoTestReport.xml:jacoco
           prefix: app
+        working-directory: app
       - name: Clear Gradle cache
         run: rm -rf ~/.gradle
