@@ -77,7 +77,7 @@ sourceSets {
 }
 
 jacoco {
-    toolVersion = "0.8.7"
+    toolVersion = "0.8.11"
 }
 
 tasks.test {
