@@ -13,11 +13,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class AppTest {
     private Javalin app;
@@ -48,6 +50,15 @@ public class AppTest {
     public void testUrlPage() throws SQLException {
         var url = new Url("https://java-page-analyzer-ru.hexlet.app/");
         UrlRepository.save(url);
+
+        assertNotNull(url.getId(), "URL ID should not be null after saving");
+
+        OkHttpClient httpClient = new OkHttpClient.Builder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
+
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/urls/" + url.getId());
             assertThat(response.code()).isEqualTo(200);
