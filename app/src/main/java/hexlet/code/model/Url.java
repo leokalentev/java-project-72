@@ -1,4 +1,5 @@
 package hexlet.code.model;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -14,10 +15,11 @@ public class Url {
     private String name;
     private LocalDateTime createdAt;
 
-    public Url (String name) {
+    public Url(String name) {
         this.name = name;
     }
-    public Url (Long id, String name) {
+
+    public Url(Long id, String name) {
         this.id = id;
         this.name = name;
     }

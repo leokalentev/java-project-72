@@ -1,20 +1,13 @@
 package hexlet.code;
 
 import hexlet.code.controller.UrlConroller;
-import hexlet.code.dto.urls.BuildUrlPage;
-import hexlet.code.dto.urls.UrlPage;
-import hexlet.code.dto.urls.UrlsPage;
-import hexlet.code.model.Url;
 import hexlet.code.repository.BaseRepository;
-import hexlet.code.repository.UrlRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
-import io.javalin.http.NotFoundResponse;
 import io.javalin.rendering.template.JavalinJte;
 import gg.jte.resolve.ResourceCodeResolver;
-import io.javalin.validation.ValidationException;
 
 import java.io.BufferedReader;
 import java.io.IOException;

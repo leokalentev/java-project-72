@@ -4,21 +4,15 @@ import hexlet.code.model.Url;
 import hexlet.code.repository.UrlRepository;
 import io.javalin.Javalin;
 import io.javalin.testtools.JavalinTest;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class AppTest {

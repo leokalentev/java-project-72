@@ -94,6 +94,9 @@ tasks.jacocoTestReport {
     }
 }
 
+checkstyle {
+    toolVersion = "10.12.4"
+}
 
 
 
