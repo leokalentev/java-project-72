@@ -33,6 +33,9 @@ dependencies {
     implementation("io.javalin:javalin-rendering:6.1.3")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1")
+    testImplementation("io.javalin:javalin-testtools:6.1.3")
+    testImplementation("org.assertj:assertj-core:3.23.1")
+    testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
 
 tasks.test {

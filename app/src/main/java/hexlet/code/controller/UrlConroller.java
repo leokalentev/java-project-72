@@ -28,7 +28,7 @@ public class UrlConroller {
             var input = ctx.formParam("url");
 
             if (input == null || input.trim().isEmpty()) {
-                ctx.sessionAttribute("flash", "The URL cannot be empty");
+                ctx.sessionAttribute("flash", "Url не может быть пустым");
                 ctx.redirect("/");
                 return;
             }
@@ -65,7 +65,7 @@ public class UrlConroller {
 
             var newUrl = new Url(baseUrl);
             UrlRepository.save(newUrl);
-            ctx.sessionAttribute("flash", "Page added successfully");
+            ctx.sessionAttribute("flash", "Страница добавлена!");
             ctx.redirect("/urls");
         } catch (ValidationException e) {
             var url = ctx.formParam("name");

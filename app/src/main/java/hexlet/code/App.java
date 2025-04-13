@@ -20,14 +20,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.stream.Collectors;
-
-import static io.javalin.rendering.template.TemplateUtil.model;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -39,13 +34,13 @@ public class App {
     private static String readResourceFile(String fileName) throws IOException {
         try (InputStream inputStream = App.class.getClassLoader().getResourceAsStream(fileName);
              BufferedReader reader = new BufferedReader(
-                     new InputStreamReader(inputStream, StandardCharsets.UTF_8))) { // Явное указание UTF-8
+                     new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             return reader.lines().collect(Collectors.joining("\n"));
         }
     }
     public static void main(String[] args) throws SQLException, IOException {
+        System.setProperty("jte.charset", "UTF-8");
         var app = getApp();
-        setupUtf8(app);
         app.start(7070);
     }
     public static Javalin getApp() throws IOException, SQLException {
@@ -82,6 +77,10 @@ public class App {
             config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
 
+        app.before(ctx -> {
+            ctx.contentType("text/html; charset=utf-8");
+            ctx.header("Content-Type", "text/html; charset=utf-8");
+        });
         app.get(NamedRoutes.rootPath(), UrlConroller::build);
         app.post(NamedRoutes.urlsPath(), UrlConroller::create);
         app.get(NamedRoutes.urlsPath(), UrlConroller::index);
@@ -95,12 +94,5 @@ public class App {
         ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
         TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
         return templateEngine;
-    }
-
-    private static void setupUtf8(Javalin app) {
-        app.before(ctx -> {
-            ctx.contentType("text/html; charset=utf-8");
-            ctx.header("Content-Type", "text/html; charset=utf-8");
-        });
     }
 }

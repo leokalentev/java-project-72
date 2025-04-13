@@ -83,4 +83,12 @@ public class UrlRepository extends BaseRepository{
             return Optional.empty();
         }
     }
+
+    public static void removeAll() throws SQLException {
+        var sql = "DELETE FROM urls";
+        try (var conn = dataSource.getConnection();
+        var stmt = conn.prepareStatement(sql)) {
+            var result = stmt.executeUpdate();
+        }
+    }
 }
