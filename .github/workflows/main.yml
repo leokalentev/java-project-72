@@ -8,6 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: app
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -20,7 +24,6 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        working-directory: app
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v3
@@ -28,21 +31,28 @@ jobs:
           arguments: build
           build-root-directory: app
 
-      - name: Build and analyze
+      - name: Run tests and generate JaCoCo report
+        run: ./gradlew test jacocoTestReport
+
+      - name: Analyze with SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonar --info
-        working-directory: app
         continue-on-error: true
-      - name: Test & publish code coverage
-        uses: paambaati/codeclimate-action@v5.0.0
+
+      - name: Install Code Climate test reporter
+        run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > cc-test-reporter
+          chmod +x cc-test-reporter
+
+      - name: Upload coverage to Code Climate
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          JACOCO_SOURCE_PATH: ${{ github.workspace }}/app/src/main/java
-        with:
-          coverageCommand: ./gradlew jacocoTestReport
-          coverageLocations: ${{ github.workspace }}/app/build/reports/jacoco/test/jacocoTestReport.xml:jacoco
-          prefix: app
-        working-directory: app
+        run: |
+          ./cc-test-reporter format-coverage build/reports/jacoco/test/jacocoTestReport.xml \
+            --input-type jacoco \
+            --prefix app
+          ./cc-test-reporter upload-coverage
+
       - name: Clear Gradle cache
         run: rm -rf ~/.gradle
