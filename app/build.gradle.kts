@@ -41,6 +41,7 @@ dependencies {
     implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
     implementation("com.konghq:unirest-java:3.14.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    implementation ("org.jsoup:jsoup:1.19.1")
 }
 
 tasks.test {

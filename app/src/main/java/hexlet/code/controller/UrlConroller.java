@@ -12,9 +12,14 @@ import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.validation.ValidationException;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.net.URI;
 import java.net.URL;
+
 import java.sql.SQLException;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
@@ -110,10 +115,32 @@ public class UrlConroller {
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Url not found"));
 
-        var check = new UrlCheck(200, "Test title", "Test h1", "Test description",
-                url.getId());
+        try {
+            HttpResponse<String> response = Unirest.get(url.getName()).asString();
 
-        UrlCheckRepository.save(check);
+            int statusCode = response.getStatus();
+            if (statusCode >= 400) {
+                throw new RuntimeException("Failed to fetch the page: HTTP " + statusCode);
+            }
+
+            String html = response.getBody();
+            Document document = Jsoup.parse(html);
+
+
+            String title = document.title();
+            String h1 = document.selectFirst("h1") != null ? document.selectFirst("h1").text() : null;
+            String description = document.selectFirst("meta[name=description]") != null
+                    ? document.selectFirst("meta[name=description]").attr("content")
+                    : null;
+
+            var check = new UrlCheck(statusCode, title, h1, description, url.getId());
+            UrlCheckRepository.save(check);
+
+            ctx.sessionAttribute("flash", "URL successfully checked!");
+        } catch (Exception e) {
+            ctx.sessionAttribute("flash", "Error checking URL: " + e.getMessage());
+        }
+
         ctx.redirect(NamedRoutes.urlPath(id));
     }
 }

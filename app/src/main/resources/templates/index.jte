@@ -4,17 +4,33 @@
 
 @template.layout.page(
     content = @`
-        @if(page.getFlash() != null)
-            <div class="alert alert-danger">
+         @if(page.getFlash() != null)
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 ${page.getFlash()}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+         @endif
 
-        <div class="container mt-5">
+         <div class="container mt-4">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light rounded mb-4 px-3">
+                <a class="navbar-brand" href="/">Page Analyzer</a>
+                    <div class="collapse navbar-collapse">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/">Главная</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/urls">Сайты</a>
+                            </li>
+                        </ul>
+                    </div>
+            </nav>
+         </div>
+
+         <div class="container mt-5">
             <div class="row justify-content-center">
                 <div class="col-md-6 text-center">
-                    <h1 class="display-4 text-primary mb-4">Анализатор страниц</h1>
+                    <h1 class="display-4 text-primary mb-4">Page Analyzer</h1>
                 </div>
             </div>
             <div class="row justify-content-center">
@@ -32,6 +48,6 @@
                     <a href="/urls" class="btn btn-outline-secondary">Добавленные сайты</a>
                 </div>
             </div>
-        </div>
+         </div>
     `
 )
