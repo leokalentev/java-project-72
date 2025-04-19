@@ -1,10 +1,14 @@
 package hexlet.code.controller;
 
 import hexlet.code.dto.urls.BuildUrlPage;
+import hexlet.code.dto.urls.UrlCheckPage;
 import hexlet.code.dto.urls.UrlPage;
 import hexlet.code.dto.urls.UrlsPage;
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
+import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
+import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.validation.ValidationException;
@@ -28,8 +32,9 @@ public class UrlConroller {
             var input = ctx.formParam("url");
 
             if (input == null || input.trim().isEmpty()) {
-                ctx.sessionAttribute("flash", "Url не может быть пустым");
-                ctx.redirect("/");
+                var page = new BuildUrlPage();
+                page.setFlash("Url cannot be empty");
+                ctx.render("index.jte", model("page", page));
                 return;
             }
 
@@ -37,8 +42,10 @@ public class UrlConroller {
             try {
                 uri = URI.create(input);
             } catch (IllegalArgumentException e) {
-                ctx.sessionAttribute("flash", "Invalid URL");
-                ctx.redirect("/");
+                var page = new BuildUrlPage();
+                page.setFlash("Invalid Url");
+                ctx.render("index.jte", model("page", page));
+
                 return;
             }
 
@@ -46,8 +53,9 @@ public class UrlConroller {
             try {
                 url = uri.toURL();
             } catch (Exception e) {
-                ctx.sessionAttribute("flash", "Invalid URL");
-                ctx.redirect("/");
+                var page = new BuildUrlPage();
+                page.setFlash("Invalid url");
+                ctx.render("index.jte", model("page", page));
                 return;
             }
             var protocol = url.getProtocol();
@@ -58,19 +66,20 @@ public class UrlConroller {
                     ? String.format("%s://%s", protocol, host)
                     : String.format("%s://%s:%d", protocol, host, port);
             if (UrlRepository.getNames(baseUrl)) {
-                ctx.sessionAttribute("flash", "The page already exists");
-                ctx.redirect("/");
+                var page = new BuildUrlPage();
+                page.setFlash("The page already exists");
+                ctx.render("index.jte", model("page", page));
                 return;
             }
 
             var newUrl = new Url(baseUrl);
             UrlRepository.save(newUrl);
-            ctx.sessionAttribute("flash", "Страница добавлена!");
+            ctx.sessionAttribute("flash", "Url added!");
             ctx.redirect("/urls");
         } catch (ValidationException e) {
             var url = ctx.formParam("name");
             var page = new BuildUrlPage(url, e.getErrors());
-            ctx.render("/", model("page", page));
+            ctx.render("index.jte", model("page", page));
         }
     }
 
@@ -86,10 +95,25 @@ public class UrlConroller {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Url not found"));
+        var check = UrlCheckRepository.getEntities();
 
         var session = ctx.consumeSessionAttribute("flash");
         var page = new UrlPage(url);
+        var checks = new UrlCheckPage(check);
+
         page.setFlash((String) session);
-        ctx.render("url.jte", model("page", page));
+        ctx.render("url.jte", model("page", page, "checkPage", checks));
+    }
+
+    public static void check(Context ctx) throws SQLException {
+        var id = ctx.pathParamAsClass("id", Long.class).get();
+        var url = UrlRepository.find(id)
+                .orElseThrow(() -> new NotFoundResponse("Url not found"));
+
+        var check = new UrlCheck(200, "Test title", "Test h1", "Test description",
+                url.getId());
+
+        UrlCheckRepository.save(check);
+        ctx.redirect(NamedRoutes.urlPath(id));
     }
 }

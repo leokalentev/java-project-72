@@ -38,6 +38,9 @@ dependencies {
     testImplementation("io.javalin:javalin-testtools:6.1.3")
     testImplementation("org.assertj:assertj-core:3.23.1")
     testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
+    implementation("com.konghq:unirest-java:3.14.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 }
 
 tasks.test {
@@ -71,7 +74,7 @@ tasks.shadowJar {
 sourceSets {
     main {
         resources {
-            srcDir("src/main/jte")
+            srcDirs("src/main/jte")
         }
     }
 }
@@ -97,6 +100,9 @@ tasks.jacocoTestReport {
 checkstyle {
     toolVersion = "10.12.4"
 }
+
+
+
 
 
 

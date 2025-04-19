@@ -6,16 +6,16 @@ import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
+import io.javalin.http.staticfiles.Location;
 import io.javalin.rendering.template.JavalinJte;
 import gg.jte.resolve.ResourceCodeResolver;
 
-import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.stream.Collectors;
+
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -23,14 +23,16 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class App {
-
     private static String readResourceFile(String fileName) throws IOException {
-        try (InputStream inputStream = App.class.getClassLoader().getResourceAsStream(fileName);
-             BufferedReader reader = new BufferedReader(
-                     new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-            return reader.lines().collect(Collectors.joining("\n"));
+        ClassLoader classLoader = App.class.getClassLoader();
+        try (InputStream inputStream = classLoader.getResourceAsStream(fileName)) {
+            if (inputStream == null) {
+                throw new FileNotFoundException("Resource not found: " + fileName);
+            }
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
+
     public static void main(String[] args) throws SQLException, IOException {
         System.setProperty("jte.charset", "UTF-8");
         var app = getApp();
@@ -70,6 +72,8 @@ public class App {
             config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
 
+
+
         app.before(ctx -> {
             ctx.contentType("text/html; charset=utf-8");
             ctx.header("Content-Type", "text/html; charset=utf-8");
@@ -78,6 +82,7 @@ public class App {
         app.post(NamedRoutes.urlsPath(), UrlConroller::create);
         app.get(NamedRoutes.urlsPath(), UrlConroller::index);
         app.get(NamedRoutes.urlPath("{id}"), UrlConroller::show);
+        app.post(NamedRoutes.urlPath("{id}"), UrlConroller::check);
         return app;
     }
 
