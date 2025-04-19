@@ -16,9 +16,9 @@
                 <thead class="table-primary">
                     <tr>
                         <th>ID</th>
-                        <th>Имя</th>
-                        <th>Дата создания</th>
-                        <th>Действия</th>
+                        <th>Name</th>
+                        <th>Date of verification</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>

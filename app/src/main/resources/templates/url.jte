@@ -46,7 +46,7 @@
                         <th>Title</th>
                         <th>H1</th>
                         <th>Description</th>
-                        <th>Дата проверки</th>
+                        <th>Date of verification</th>
                     </tr>
                 </thead>
                 <tbody>

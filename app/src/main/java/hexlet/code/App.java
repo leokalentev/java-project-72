@@ -6,7 +6,6 @@ import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
-import io.javalin.http.staticfiles.Location;
 import io.javalin.rendering.template.JavalinJte;
 import gg.jte.resolve.ResourceCodeResolver;
 

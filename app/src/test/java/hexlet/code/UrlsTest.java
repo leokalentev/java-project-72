@@ -43,6 +43,7 @@ public class UrlsTest {
                  <tr>ID</tr>
                  <tr>Name</tr>
                  <tr>Date of verification</tr>
+                 <tr>Actions</tr>
                 """;
         mockWebServer.enqueue(new MockResponse().setBody(fakeHtml).setResponseCode(200));
 
@@ -57,6 +58,7 @@ public class UrlsTest {
             assertThat(responseBody).contains("ID");
             assertThat(responseBody).contains("Name");
             assertThat(responseBody).contains("Date of verification");
+            assertThat(responseBody).contains("Actions");
             assertThat(response.code()).isEqualTo(200);
         });
     }

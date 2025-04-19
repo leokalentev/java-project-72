@@ -82,7 +82,7 @@ public class UrlTest {
     public void testCheckUrl() throws SQLException {
         String fakeHtml = """
                  <tr>ID</tr>
-                 <tr>Status code</tr>
+                 <tr>Status Code</tr>
                  <tr>Title</tr>
                  <tr>H1</tr>
                  <tr>Description</tr>
@@ -103,7 +103,7 @@ public class UrlTest {
             var responseBody = urlPage.body().string();
 
             assertThat(responseBody).contains("ID");
-            assertThat(responseBody).contains("Status code");
+            assertThat(responseBody).contains("Status Code");
             assertThat(responseBody).contains("Title");
             assertThat(responseBody).contains("H1");
             assertThat(responseBody).contains("Description");
