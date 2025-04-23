@@ -16,4 +16,4 @@
 
 ## Сайт
 
-[![Перейти](https://java-project-72-z6ro.onrender.com)]
+![Перейти](https://java-project-72-z6ro.onrender.com)
