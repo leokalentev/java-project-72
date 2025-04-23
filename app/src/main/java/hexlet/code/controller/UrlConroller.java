@@ -38,7 +38,8 @@ public class UrlConroller {
 
             if (input == null || input.trim().isEmpty()) {
                 var page = new BuildUrlPage();
-                page.setFlash("Url cannot be empty");
+                page.setFlash("Url \u043D\u0435 \u043C\u043E\u0436\u0435\u0442 \u0431\u044B\u0442\u044C "
+                        + "\u043F\u0443\u0441\u0442\u044B\u043C");
                 ctx.render("index.jte", model("page", page));
                 return;
             }
@@ -48,7 +49,8 @@ public class UrlConroller {
                 uri = URI.create(input);
             } catch (IllegalArgumentException e) {
                 var page = new BuildUrlPage();
-                page.setFlash("Invalid Url");
+                page.setFlash("\u041D\u0435\u0434\u043E\u043F\u0443\u0441\u0442\u0438\u043C\u044B\u0439 "
+                        + "URL-\u0430\u0434\u0440\u0435\u0441");
                 ctx.render("index.jte", model("page", page));
 
                 return;
@@ -59,7 +61,8 @@ public class UrlConroller {
                 url = uri.toURL();
             } catch (Exception e) {
                 var page = new BuildUrlPage();
-                page.setFlash("Invalid url");
+                page.setFlash("\u041D\u0435\u0434\u043E\u043F\u0443\u0441\u0442\u0438\u043C\u044B\u0439 "
+                        + "URL-\u0430\u0434\u0440\u0435\u0441");
                 ctx.render("index.jte", model("page", page));
                 return;
             }
@@ -72,14 +75,14 @@ public class UrlConroller {
                     : String.format("%s://%s:%d", protocol, host, port);
             if (UrlRepository.getNames(baseUrl)) {
                 var page = new BuildUrlPage();
-                page.setFlash("The page already exists");
+                page.setFlash("Url \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442");
                 ctx.render("index.jte", model("page", page));
                 return;
             }
 
             var newUrl = new Url(baseUrl);
             UrlRepository.save(newUrl);
-            ctx.sessionAttribute("flash", "Url added!");
+            ctx.sessionAttribute("flash", "Url \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D!");
             ctx.redirect("/urls");
         } catch (ValidationException e) {
             var url = ctx.formParam("name");
@@ -136,7 +139,8 @@ public class UrlConroller {
             var check = new UrlCheck(statusCode, title, h1, description, url.getId());
             UrlCheckRepository.save(check);
 
-            ctx.sessionAttribute("flash", "URL successfully checked!");
+            ctx.sessionAttribute("flash", "URL \u0443\u0441\u043F\u0435\u0448\u043D\u043E "
+                    + "\u043F\u0440\u043E\u0432\u0435\u0440\u0435\u043D!");
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Error checking URL: " + e.getMessage());
         }

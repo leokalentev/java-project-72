@@ -4,39 +4,21 @@ import hexlet.code.model.Url;
 import hexlet.code.repository.UrlRepository;
 import io.javalin.Javalin;
 import io.javalin.testtools.JavalinTest;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.sql.SQLException;
 
 
 public class IndexTest {
     private Javalin app;
-    private static MockWebServer mockWebServer;
 
     @BeforeEach
     public void setUp() throws SQLException, IOException {
         app = App.getApp();
         UrlRepository.removeAll();
-    }
-
-    @BeforeAll
-    public static void startMock() throws IOException {
-        mockWebServer = new MockWebServer();
-        mockWebServer.start();
-    }
-
-    @AfterAll
-    public static void endMock() throws IOException {
-        mockWebServer.shutdown();
     }
 
     @Test
@@ -53,8 +35,13 @@ public class IndexTest {
         JavalinTest.test(app, (server, client) -> {
             var response = client.post("/urls", "url=");
             assertThat(response.code()).isEqualTo(200);
+
             var body = response.body().string();
-            assertThat(body).contains("Url cannot be empty");
+            assertThat(body).contains("Url \u043D\u0435 \u043C\u043E\u0436\u0435\u0442 \u0431\u044B\u0442\u044C "
+                    + "\u043F\u0443\u0441\u0442\u044B\u043C");
+
+            var allUrls = UrlRepository.getEntities();
+            assertThat(allUrls).isEmpty();
         });
     }
 
@@ -63,33 +50,32 @@ public class IndexTest {
         JavalinTest.test(app, (server, client) -> {
             var response = client.post("/urls", "url=not-a-url");
             assertThat(response.code()).isEqualTo(200);
+
             var body = response.body().string();
-            assertThat(body).contains("Invalid url");
+            assertThat(body).contains("\u041D\u0435\u0434\u043E\u043F\u0443\u0441\u0442\u0438\u043C\u044B\u0439 "
+                    + "URL-\u0430\u0434\u0440\u0435\u0441");
+
+            var urls = UrlRepository.getEntities();
+            assertThat(urls).isEmpty();
         });
     }
 
     @Test
-    public void testCreateUrlPageAlready() throws IOException, SQLException {
+    public void testCreateUrlPageAlready() {
         JavalinTest.test(app, (server, client) -> {
-            mockWebServer.enqueue(new MockResponse()
-                    .setResponseCode(200)
-                    .setBody("<html><title>Ignored</title><body></body></html>"));
+            String testUrl = "https://example.com";
+            UrlRepository.save(new Url(testUrl));
 
-            String testUrl = mockWebServer.url("/").toString();
-
-            URI uri = URI.create(testUrl);
-            URL urlObj = uri.toURL();
-            String baseUrl = urlObj.getPort() == -1
-                    ? String.format("%s://%s", urlObj.getProtocol(), urlObj.getHost())
-                    : String.format("%s://%s:%d", urlObj.getProtocol(), urlObj.getHost(), urlObj.getPort());
-
-            UrlRepository.save(new Url(baseUrl));
             var response = client.post("/urls", "url=" + testUrl);
-
             assertThat(response.code()).isEqualTo(200);
 
             String body = response.body().string();
-            assertThat(body).contains("The page already exists");
+            assertThat(body).
+                    contains("Url \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442");
+
+            var urls = UrlRepository.getEntities();
+            assertThat(urls).hasSize(1);
+            assertThat(urls.get(0).getName()).isEqualTo(testUrl);
         });
     }
 }
