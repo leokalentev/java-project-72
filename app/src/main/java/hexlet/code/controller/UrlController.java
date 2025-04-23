@@ -145,7 +145,7 @@ public class UrlController {
             ctx.sessionAttribute("flash", "Error checking URL: " + e.getMessage());
         }
 
-        ctx.redirect("/urls/" + id + "/checks");
+        showChecks(ctx);
     }
 
     public static void showChecks(Context ctx) throws SQLException {
