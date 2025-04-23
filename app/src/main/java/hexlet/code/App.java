@@ -1,6 +1,6 @@
 package hexlet.code;
 
-import hexlet.code.controller.UrlConroller;
+import hexlet.code.controller.UrlController;
 import hexlet.code.repository.BaseRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
@@ -75,11 +75,12 @@ public class App {
             ctx.contentType("text/html; charset=utf-8");
             ctx.header("Content-Type", "text/html; charset=utf-8");
         });
-        app.get(NamedRoutes.rootPath(), UrlConroller::build);
-        app.post(NamedRoutes.urlsPath(), UrlConroller::create);
-        app.get(NamedRoutes.urlsPath(), UrlConroller::index);
-        app.get(NamedRoutes.urlPath("{id}"), UrlConroller::show);
-        app.post(NamedRoutes.urlPath("{id}"), UrlConroller::check);
+        app.get(NamedRoutes.rootPath(), UrlController::build);
+        app.post(NamedRoutes.urlsPath(), UrlController::create);
+        app.get(NamedRoutes.urlsPath(), UrlController::index);
+        app.get(NamedRoutes.urlPath("{id}"), UrlController::show);
+        app.post("/urls/{id}/checks", UrlController::check);
+        app.get("/urls/{id}/checks", UrlController::showChecks);
         return app;
     }
 

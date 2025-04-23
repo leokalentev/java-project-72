@@ -8,7 +8,6 @@ import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
-import hexlet.code.util.NamedRoutes;
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 import io.javalin.validation.ValidationException;
@@ -21,10 +20,12 @@ import java.net.URI;
 import java.net.URL;
 
 import java.sql.SQLException;
+import java.util.List;
+
 
 import static io.javalin.rendering.template.TemplateUtil.model;
 
-public class UrlConroller {
+public class UrlController {
     public static void build(Context ctx) {
         var page = new BuildUrlPage();
         var session = ctx.consumeSessionAttribute("flash");
@@ -129,7 +130,6 @@ public class UrlConroller {
             String html = response.getBody();
             Document document = Jsoup.parse(html);
 
-
             String title = document.title();
             String h1 = document.selectFirst("h1") != null ? document.selectFirst("h1").text() : null;
             String description = document.selectFirst("meta[name=description]") != null
@@ -139,12 +139,28 @@ public class UrlConroller {
             var check = new UrlCheck(statusCode, title, h1, description, url.getId());
             UrlCheckRepository.save(check);
 
-            ctx.sessionAttribute("flash", "URL \u0443\u0441\u043F\u0435\u0448\u043D\u043E "
-                    + "\u043F\u0440\u043E\u0432\u0435\u0440\u0435\u043D!");
+            ctx.sessionAttribute("flash", "URL успешно проверен!");
+
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Error checking URL: " + e.getMessage());
         }
 
-        ctx.redirect(NamedRoutes.urlPath(id));
+        ctx.redirect("/urls/" + id + "/checks");
+    }
+
+    public static void showChecks(Context ctx) throws SQLException {
+        var id = ctx.pathParamAsClass("id", Long.class).get();
+        var url = UrlRepository.find(id)
+                .orElseThrow(() -> new NotFoundResponse("Url not found"));
+
+        List<UrlCheck> checks = UrlCheckRepository.find(id);
+        var session = ctx.consumeSessionAttribute("flash");
+
+        var page = new UrlPage(url);
+        page.setFlash((String) session);
+
+        var checkPage = new UrlCheckPage(checks);
+
+        ctx.render("checks.jte", model("page", page, "checkPage", checkPage));
     }
 }
