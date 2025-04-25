@@ -14,7 +14,7 @@ import static hexlet.code.repository.BaseRepository.dataSource;
 
 public class UrlCheckRepository {
     public static void save(UrlCheck urlCheck) throws SQLException {
-        String sql = "INSERT INTO url_checks (statusCode, title, h1, description, urlId, created_at) "
+        String sql = "INSERT INTO url_checks (statusCode, title, h1, description, url_id, created_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
         try (var conn = dataSource.getConnection();
              var preparedStatment = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -38,7 +38,7 @@ public class UrlCheckRepository {
     }
 
     public static List<UrlCheck> find(Long urlId) throws SQLException {
-        var sql = "SELECT * FROM url_checks WHERE urlId = ?";
+        var sql = "SELECT * FROM url_checks WHERE  url_id = ?";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, urlId);
@@ -61,31 +61,8 @@ public class UrlCheckRepository {
         }
     }
 
-    public static List<UrlCheck> getEntities() throws SQLException {
-        var sql = "SELECT * FROM url_checks ORDER BY created_at DESC";
-        try (var conn = dataSource.getConnection();
-             var stm = conn.prepareStatement(sql)) {
-            var resultSet = stm.executeQuery();
-            var result = new ArrayList<UrlCheck>();
-            while (resultSet.next()) {
-                var id = resultSet.getLong("id");
-                var statusCode = resultSet.getInt("statusCode");
-                var title = resultSet.getString("title");
-                var h1 = resultSet.getString("h1");
-                var description = resultSet.getString("description");
-                var createdAt = resultSet.getTimestamp("created_at").toLocalDateTime();
-
-                var urlCheck = new UrlCheck(statusCode, title, h1, description);
-                urlCheck.setId(id);
-                urlCheck.setCreatedAt(createdAt);
-                result.add(urlCheck);
-            }
-            return result;
-        }
-    }
-
     public static UrlCheck getLastCheckForUrl(long urlId) throws SQLException {
-        var sql = "SELECT * FROM url_checks WHERE urlId = ? ORDER BY created_at DESC LIMIT 1";
+        var sql = "SELECT * FROM url_checks WHERE  url_id = ? ORDER BY created_at DESC LIMIT 1";
         try (var conn = dataSource.getConnection();
              var stm = conn.prepareStatement(sql)) {
             stm.setLong(1, urlId);

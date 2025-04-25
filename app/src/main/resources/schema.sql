@@ -13,7 +13,7 @@ CREATE TABLE url_checks (
     title VARCHAR(255) NOT NULL,
     h1 VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    urlId BIGINT NOT NULL,
+    url_id BIGINT NOT NULL,
     created_at TIMESTAMP,
-    CONSTRAINT fk_url FOREIGN KEY (urlId) REFERENCES urls(id) ON DELETE CASCADE
+    CONSTRAINT fk_url FOREIGN KEY (url_id) REFERENCES urls(id) ON DELETE CASCADE
 );
