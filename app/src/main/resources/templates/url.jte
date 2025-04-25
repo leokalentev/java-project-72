@@ -54,6 +54,30 @@
             <form method="post" action="/urls/${page.getUrl().getId()}/checks" class="mb-4">
                 <button type="submit" class="btn btn-primary">Запустить проверку</button>
             </form>
+            <table class="table table-bordered table-striped">
+                <thead class="table-primary">
+                    <tr>
+                        <th>ID</th>
+                        <th>Status Code</th>
+                        <th>Title</th>
+                        <th>H1</th>
+                        <th>Description</th>
+                        <th>Date of verification</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var urlCheck : checkPage.getUrlChecks())
+                        <tr>
+                            <td>${urlCheck.getId()}</td>
+                            <td>${urlCheck.getStatusCode()}</td>
+                            <td>${urlCheck.getTitle()}</td>
+                            <td>${urlCheck.getH1()}</td>
+                            <td>${urlCheck.getDescription()}</td>
+                            <td>${urlCheck.getFormattedCreatedAt()}</td>
+                        </tr>
+                    @endfor
+                </tbody>
+            </table>
         </div>
     `
 )

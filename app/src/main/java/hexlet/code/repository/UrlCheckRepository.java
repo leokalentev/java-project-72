@@ -38,7 +38,7 @@ public class UrlCheckRepository {
     }
 
     public static List<UrlCheck> find(Long urlId) throws SQLException {
-        var sql = "SELECT * FROM url_checks WHERE urlId = ? ORDER BY created_at DESC";
+        var sql = "SELECT * FROM url_checks WHERE urlId = ?";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, urlId);
@@ -62,7 +62,7 @@ public class UrlCheckRepository {
     }
 
     public static List<UrlCheck> getEntities() throws SQLException {
-        var sql = "SELECT * FROM url_checks";
+        var sql = "SELECT * FROM url_checks ORDER BY created_at DESC";
         try (var conn = dataSource.getConnection();
              var stm = conn.prepareStatement(sql)) {
             var resultSet = stm.executeQuery();
@@ -81,6 +81,29 @@ public class UrlCheckRepository {
                 result.add(urlCheck);
             }
             return result;
+        }
+    }
+
+    public static UrlCheck getLastCheckForUrl(long urlId) throws SQLException {
+        var sql = "SELECT * FROM url_checks WHERE urlId = ? ORDER BY created_at DESC LIMIT 1";
+        try (var conn = dataSource.getConnection();
+             var stm = conn.prepareStatement(sql)) {
+            stm.setLong(1, urlId);
+            var resultSet = stm.executeQuery();
+            if (resultSet.next()) {
+                var id = resultSet.getLong("id");
+                var statusCode = resultSet.getInt("statusCode");
+                var title = resultSet.getString("title");
+                var h1 = resultSet.getString("h1");
+                var description = resultSet.getString("description");
+                var createdAt = resultSet.getTimestamp("created_at").toLocalDateTime();
+
+                var urlCheck = new UrlCheck(statusCode, title, h1, description);
+                urlCheck.setId(id);
+                urlCheck.setCreatedAt(createdAt);
+                return urlCheck;
+            }
+            return null;
         }
     }
 }

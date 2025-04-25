@@ -43,11 +43,6 @@
                     </form>
                 </div>
             </div>
-            <div class="row justify-content-center mt-3">
-                <div class="col-md-6 text-center">
-                    <a href="/urls" class="btn btn-outline-secondary">Добавленные сайты</a>
-                </div>
-            </div>
          </div>
     `
 )

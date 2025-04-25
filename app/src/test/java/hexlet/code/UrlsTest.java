@@ -26,6 +26,7 @@ public class UrlsTest {
         var testUrl = "http://example.com";
         var url = new Url(testUrl);
         UrlRepository.save(url);
+        assertThat(UrlRepository.find(url.getId())).isNotEmpty();
 
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/urls");
@@ -36,6 +37,8 @@ public class UrlsTest {
             assertThat(responseBody).contains("ID");
             assertThat(responseBody).contains("Name");
             assertThat(responseBody).contains("Date of verification");
+            assertThat(responseBody).contains("Last check created at");
+            assertThat(responseBody).contains("Last check status code");
             assertThat(responseBody).contains("Actions");
 
             assertThat(responseBody).contains(testUrl);

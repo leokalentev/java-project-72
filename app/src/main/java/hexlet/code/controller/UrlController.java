@@ -22,7 +22,6 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 
-
 import static io.javalin.rendering.template.TemplateUtil.model;
 
 public class UrlController {
@@ -39,8 +38,7 @@ public class UrlController {
 
             if (input == null || input.trim().isEmpty()) {
                 var page = new BuildUrlPage();
-                page.setFlash("Url \u043D\u0435 \u043C\u043E\u0436\u0435\u0442 \u0431\u044B\u0442\u044C "
-                        + "\u043F\u0443\u0441\u0442\u044B\u043C");
+                page.setFlash("Url not empty");
                 ctx.render("index.jte", model("page", page));
                 return;
             }
@@ -50,8 +48,7 @@ public class UrlController {
                 uri = URI.create(input);
             } catch (IllegalArgumentException e) {
                 var page = new BuildUrlPage();
-                page.setFlash("\u041D\u0435\u0434\u043E\u043F\u0443\u0441\u0442\u0438\u043C\u044B\u0439 "
-                        + "URL-\u0430\u0434\u0440\u0435\u0441");
+                page.setFlash("Invalid Url");
                 ctx.render("index.jte", model("page", page));
 
                 return;
@@ -62,8 +59,7 @@ public class UrlController {
                 url = uri.toURL();
             } catch (Exception e) {
                 var page = new BuildUrlPage();
-                page.setFlash("\u041D\u0435\u0434\u043E\u043F\u0443\u0441\u0442\u0438\u043C\u044B\u0439 "
-                        + "URL-\u0430\u0434\u0440\u0435\u0441");
+                page.setFlash("Invalid url");
                 ctx.render("index.jte", model("page", page));
                 return;
             }
@@ -76,14 +72,14 @@ public class UrlController {
                     : String.format("%s://%s:%d", protocol, host, port);
             if (UrlRepository.getNames(baseUrl)) {
                 var page = new BuildUrlPage();
-                page.setFlash("Url \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442");
+                page.setFlash("Url is already there");
                 ctx.render("index.jte", model("page", page));
                 return;
             }
 
             var newUrl = new Url(baseUrl);
             UrlRepository.save(newUrl);
-            ctx.sessionAttribute("flash", "Url \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D!");
+            ctx.sessionAttribute("flash", "Url added!");
             ctx.redirect("/urls");
         } catch (ValidationException e) {
             var url = ctx.formParam("name");
@@ -94,61 +90,20 @@ public class UrlController {
 
     public static void index(Context ctx) throws SQLException {
         var urls = UrlRepository.getEntities();
-        var session = ctx.consumeSessionAttribute("flash");
         var page = new UrlsPage(urls);
+
+        for (var url : urls) {
+            var lastCheck = UrlCheckRepository.getLastCheckForUrl(url.getId());
+            page.setLastCheck(url.getId(), lastCheck);
+        }
+
+        var session = ctx.consumeSessionAttribute("flash");
         page.setFlash((String) session);
+
         ctx.render("urls.jte", model("page", page));
     }
 
     public static void show(Context ctx) throws SQLException {
-        var id = ctx.pathParamAsClass("id", Long.class).get();
-        var url = UrlRepository.find(id)
-                .orElseThrow(() -> new NotFoundResponse("Url not found"));
-        var check = UrlCheckRepository.getEntities();
-
-        var session = ctx.consumeSessionAttribute("flash");
-        var page = new UrlPage(url);
-        var checks = new UrlCheckPage(check);
-
-        page.setFlash((String) session);
-        ctx.render("url.jte", model("page", page, "checkPage", checks));
-    }
-
-    public static void check(Context ctx) throws SQLException {
-        var id = ctx.pathParamAsClass("id", Long.class).get();
-        var url = UrlRepository.find(id)
-                .orElseThrow(() -> new NotFoundResponse("Url not found"));
-
-        try {
-            HttpResponse<String> response = Unirest.get(url.getName()).asString();
-
-            int statusCode = response.getStatus();
-            if (statusCode >= 400) {
-                throw new RuntimeException("Failed to fetch the page: HTTP " + statusCode);
-            }
-
-            String html = response.getBody();
-            Document document = Jsoup.parse(html);
-
-            String title = document.title();
-            String h1 = document.selectFirst("h1") != null ? document.selectFirst("h1").text() : null;
-            String description = document.selectFirst("meta[name=description]") != null
-                    ? document.selectFirst("meta[name=description]").attr("content")
-                    : null;
-
-            var check = new UrlCheck(statusCode, title, h1, description, url.getId());
-            UrlCheckRepository.save(check);
-
-            ctx.sessionAttribute("flash", "URL успешно проверен!");
-
-        } catch (Exception e) {
-            ctx.sessionAttribute("flash", "Error checking URL: " + e.getMessage());
-        }
-
-        showChecks(ctx);
-    }
-
-    public static void showChecks(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var url = UrlRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Url not found"));
@@ -161,6 +116,43 @@ public class UrlController {
 
         var checkPage = new UrlCheckPage(checks);
 
-        ctx.render("checks.jte", model("page", page, "checkPage", checkPage));
+        ctx.render("url.jte", model("page", page, "checkPage", checkPage));
     }
+
+
+    public static void check(Context ctx) throws SQLException {
+        var id = ctx.pathParamAsClass("id", Long.class).get();
+        var url = UrlRepository.find(id)
+                .orElseThrow(() -> new NotFoundResponse("Url not found"));
+
+        int statusCode;
+        String title = "";
+        String h1 = "";
+        String description = "";
+
+        try {
+            HttpResponse<String> response = Unirest.get(url.getName()).asString();
+            statusCode = response.getStatus();
+
+            String html = response.getBody();
+            Document document = Jsoup.parse(html);
+
+            title = document.title() != null ? document.title() : "";
+            h1 = document.selectFirst("h1") != null ? document.selectFirst("h1").text() : "";
+            description = document.selectFirst("meta[name=description]") != null
+                    ? document.selectFirst("meta[name=description]").attr("content")
+                    : "";
+
+            ctx.sessionAttribute("flash", "URL check!");
+        } catch (Exception e) {
+            statusCode = 500;
+            ctx.sessionAttribute("flash", "Error: " + e.getMessage());
+        }
+
+        var check = new UrlCheck(statusCode, title, h1, description, url.getId());
+        UrlCheckRepository.save(check);
+
+        show(ctx);
+    }
+
 }

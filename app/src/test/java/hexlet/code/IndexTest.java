@@ -37,8 +37,7 @@ public class IndexTest {
             assertThat(response.code()).isEqualTo(200);
 
             var body = response.body().string();
-            assertThat(body).contains("Url \u043D\u0435 \u043C\u043E\u0436\u0435\u0442 \u0431\u044B\u0442\u044C "
-                    + "\u043F\u0443\u0441\u0442\u044B\u043C");
+            assertThat(body).contains("Url not empty");
 
             var allUrls = UrlRepository.getEntities();
             assertThat(allUrls).isEmpty();
@@ -52,8 +51,7 @@ public class IndexTest {
             assertThat(response.code()).isEqualTo(200);
 
             var body = response.body().string();
-            assertThat(body).contains("\u041D\u0435\u0434\u043E\u043F\u0443\u0441\u0442\u0438\u043C\u044B\u0439 "
-                    + "URL-\u0430\u0434\u0440\u0435\u0441");
+            assertThat(body).contains("Invalid url");
 
             var urls = UrlRepository.getEntities();
             assertThat(urls).isEmpty();
@@ -71,7 +69,7 @@ public class IndexTest {
 
             String body = response.body().string();
             assertThat(body).
-                    contains("Url \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442");
+                    contains("Url is already there");
 
             var urls = UrlRepository.getEntities();
             assertThat(urls).hasSize(1);
