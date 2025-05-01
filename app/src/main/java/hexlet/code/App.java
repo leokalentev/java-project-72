@@ -42,7 +42,9 @@ public class App {
 
         var hikariConfig = new HikariConfig();
 
-        var dbUrl = System.getenv("JDBC_DATABASE_URL");
+        var isTest = System.getProperty("java.class.path").contains("test");
+        var dbUrl = !isTest ? System.getenv("JDBC_DATABASE_URL") : null;
+
         if (dbUrl != null && !dbUrl.isBlank()) {
             hikariConfig.setJdbcUrl(dbUrl);
             hikariConfig.setUsername(System.getenv("DB_USERNAME"));
