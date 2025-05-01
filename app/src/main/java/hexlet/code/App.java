@@ -38,24 +38,26 @@ public class App {
         app.start(7070);
     }
     public static Javalin getApp() throws IOException, SQLException {
-        var env = System.getenv().getOrDefault("APP_ENV", "development");
+        System.setProperty("jte.charset", "UTF-8");
+
         var hikariConfig = new HikariConfig();
 
-        if ("production".equals(env)) {
-            var dbUrl = System.getenv("JDBC_DATABASE_URL");
-            var dbUser = System.getenv("DB_USERNAME");
-            var dbPassword = System.getenv("DB_PASSWORD");
-
+        var dbUrl = System.getenv("JDBC_DATABASE_URL");
+        if (dbUrl != null && !dbUrl.isBlank()) {
             hikariConfig.setJdbcUrl(dbUrl);
-            hikariConfig.setUsername(dbUser);
-            hikariConfig.setPassword(dbPassword);
+            hikariConfig.setUsername(System.getenv("DB_USERNAME"));
+            hikariConfig.setPassword(System.getenv("DB_PASSWORD"));
         } else {
             hikariConfig.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
+            hikariConfig.setUsername("");
+            hikariConfig.setPassword("");
+            hikariConfig.setDriverClassName("org.h2.Driver");
         }
 
         var dataSource = new HikariDataSource(hikariConfig);
+        BaseRepository.dataSource = dataSource;
 
-        if ("development".equals(env)) {
+        if (dbUrl == null || dbUrl.isBlank()) {
             var sql = readResourceFile("schema.sql");
             log.info(sql);
             try (var connection = dataSource.getConnection();
@@ -64,9 +66,7 @@ public class App {
             }
         }
 
-        BaseRepository.dataSource = dataSource;
-
-        Javalin app = Javalin.create(config -> {
+        var app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
             config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
@@ -81,8 +81,10 @@ public class App {
         app.get(NamedRoutes.urlsPath(), UrlController::index);
         app.get(NamedRoutes.urlPath("{id}"), UrlController::show);
         app.post("/urls/{id}/checks", UrlController::check);
+
         return app;
     }
+
 
     private static TemplateEngine createTemplateEngine() {
         ClassLoader classLoader = App.class.getClassLoader();
