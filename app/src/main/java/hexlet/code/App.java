@@ -4,10 +4,13 @@ import hexlet.code.controller.UrlController;
 import hexlet.code.repository.BaseRepository;
 import hexlet.code.util.NamedRoutes;
 import io.javalin.Javalin;
+import io.javalin.rendering.template.JavalinJte;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
-import io.javalin.rendering.template.JavalinJte;
 import gg.jte.resolve.ResourceCodeResolver;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,62 +18,55 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 public class App {
     private static String readResourceFile(String fileName) throws IOException {
         ClassLoader classLoader = App.class.getClassLoader();
-        try (InputStream inputStream = classLoader.getResourceAsStream(fileName)) {
-            if (inputStream == null) {
+        try (InputStream input = classLoader.getResourceAsStream(fileName)) {
+            if (input == null) {
                 throw new FileNotFoundException("Resource not found: " + fileName);
             }
-            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            return new String(input.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 
     public static void main(String[] args) throws SQLException, IOException {
         System.setProperty("jte.charset", "UTF-8");
-        var app = getApp();
-        app.start(7070);
+        getApp().start(7070);
     }
+
     public static Javalin getApp() throws IOException, SQLException {
         System.setProperty("jte.charset", "UTF-8");
+        String env = System.getenv().getOrDefault("APP_ENV", "development");
 
-        var hikariConfig = new HikariConfig();
-
-        var isTest = System.getProperty("java.class.path").contains("test");
-        var dbUrl = !isTest ? System.getenv("JDBC_DATABASE_URL") : null;
-
-        if (dbUrl != null && !dbUrl.isBlank()) {
-            hikariConfig.setJdbcUrl(dbUrl);
-            hikariConfig.setUsername(System.getenv("DB_USERNAME"));
-            hikariConfig.setPassword(System.getenv("DB_PASSWORD"));
+        HikariConfig config = new HikariConfig();
+        if ("production".equals(env)) {
+            String dbUrl      = System.getenv("JDBC_DATABASE_URL");
+            String dbUser     = System.getenv("DB_USERNAME");
+            String dbPassword = System.getenv("DB_PASSWORD");
+            config.setJdbcUrl(dbUrl);
+            config.setUsername(dbUser);
+            config.setPassword(dbPassword);
         } else {
-            hikariConfig.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
-            hikariConfig.setUsername("");
-            hikariConfig.setPassword("");
-            hikariConfig.setDriverClassName("org.h2.Driver");
+            config.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
+            config.setDriverClassName("org.h2.Driver");
         }
 
-        var dataSource = new HikariDataSource(hikariConfig);
+        var dataSource = new HikariDataSource(config);
         BaseRepository.dataSource = dataSource;
 
-        if (dbUrl == null || dbUrl.isBlank()) {
+        if (!"production".equals(env)) {
             var sql = readResourceFile("schema.sql");
-            log.info(sql);
-            try (var connection = dataSource.getConnection();
-                 var statement = connection.createStatement()) {
-                statement.execute(sql);
+            log.info("Initializing DB schema:\n{}", sql);
+            try (var conn = dataSource.getConnection();
+                 var stmt = conn.createStatement()) {
+                stmt.execute(sql);
             }
         }
 
-        var app = Javalin.create(config -> {
-            config.bundledPlugins.enableDevLogging();
-            config.fileRenderer(new JavalinJte(createTemplateEngine()));
+        Javalin app = Javalin.create(cfg -> {
+            cfg.bundledPlugins.enableDevLogging();
+            cfg.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
 
         app.before(ctx -> {
@@ -87,12 +83,9 @@ public class App {
         return app;
     }
 
-
     private static TemplateEngine createTemplateEngine() {
         ClassLoader classLoader = App.class.getClassLoader();
-        System.setProperty("jte.charset", "UTF-8");
-        ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
-        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
-        return templateEngine;
+        ResourceCodeResolver resolver = new ResourceCodeResolver("templates", classLoader);
+        return TemplateEngine.create(resolver, ContentType.Html);
     }
 }
