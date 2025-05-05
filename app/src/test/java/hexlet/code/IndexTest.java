@@ -12,11 +12,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 
-public class IndexTest {
+public final class IndexTest {
     private Javalin app;
 
     @BeforeEach
-    public void setUp() throws SQLException, IOException {
+    public final void setUp() throws SQLException, IOException {
         app = App.getApp();
         UrlRepository.removeAll();
     }

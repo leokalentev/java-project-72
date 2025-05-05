@@ -20,13 +20,13 @@ import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ChecksTest {
+public final class ChecksTest {
 
     private Javalin app;
     private static MockWebServer mockWebServer;
 
     @BeforeEach
-    public void setUp() throws SQLException, IOException {
+    public final void setUp() throws SQLException, IOException {
         app = App.getApp();
         UrlRepository.removeAll();
     }
