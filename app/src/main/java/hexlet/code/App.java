@@ -40,18 +40,20 @@ public class App {
         String env = System.getenv().getOrDefault("APP_ENV", "development");
 
         HikariConfig config = new HikariConfig();
-        if ("production".equals(env) || "test".equals(env)) {
-            String dbUrl = System.getenv("JDBC_DATABASE_URL");
-            if (dbUrl != null && !dbUrl.isEmpty()) {
-                String dbUser = System.getenv("DB_USERNAME");
-                String dbPassword = System.getenv("DB_PASSWORD");
-                config.setJdbcUrl(dbUrl);
-                config.setUsername(dbUser);
-                config.setPassword(dbPassword);
-            } else if ("test".equals(env)) {
-                config.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
-                config.setDriverClassName("org.h2.Driver");
-            }
+
+        String dbUrl = System.getenv("JDBC_DATABASE_URL");
+        if (dbUrl != null && !dbUrl.isEmpty()) {
+            config.setJdbcUrl(dbUrl);
+            config.setUsername(System.getenv("DB_USERNAME"));
+            config.setPassword(System.getenv("DB_PASSWORD"));
+
+        } else if ("production".equals(env)) {
+            throw new IllegalStateException("JDBC_DATABASE_URL must be set in production");
+
+        } else if ("test".equals(env)) {
+            config.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
+            config.setDriverClassName("org.h2.Driver");
+
         } else {
             config.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
             config.setDriverClassName("org.h2.Driver");
