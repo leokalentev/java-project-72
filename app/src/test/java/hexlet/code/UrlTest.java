@@ -22,7 +22,7 @@ public final class UrlTest {
     private static MockWebServer mockWebServer;
 
     @BeforeEach
-    public final void setUp() throws SQLException, IOException {
+    public void setUp() throws SQLException, IOException {
         app = App.getApp();
         UrlRepository.removeAll();
     }

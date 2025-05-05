@@ -16,7 +16,7 @@ public final class IndexTest {
     private Javalin app;
 
     @BeforeEach
-    public final void setUp() throws SQLException, IOException {
+    public void setUp() throws SQLException, IOException {
         app = App.getApp();
         UrlRepository.removeAll();
     }
