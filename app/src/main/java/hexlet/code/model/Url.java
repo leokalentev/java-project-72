@@ -10,7 +10,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Url {
+public final class Url {
     private Long id;
     private String name;
     private LocalDateTime createdAt;

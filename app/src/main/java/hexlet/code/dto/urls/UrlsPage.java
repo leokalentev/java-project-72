@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class UrlsPage extends BasePage {
+public final class UrlsPage extends BasePage {
     private List<Url> urls;
     private Map<Long, UrlCheck> lastChecks = new HashMap<>();
 

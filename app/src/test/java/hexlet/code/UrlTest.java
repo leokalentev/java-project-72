@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class UrlTest {
+public final class UrlTest {
     private Javalin app;
     private static MockWebServer mockWebServer;
 
