@@ -1,8 +1,9 @@
+@import java.time.format.DateTimeFormatter
 @import hexlet.code.dto.urls.UrlPage
 @import hexlet.code.dto.urls.UrlCheckPage
 @param UrlPage page
 @param UrlCheckPage checkPage
-
+@param DateTimeFormatter formatter
 
 @template.layout.page(
     content = @`
@@ -13,7 +14,7 @@
             </div>
         @endif
 
-         <div class="container mt-4">
+        <div class="container mt-4">
             <nav class="navbar navbar-expand-lg navbar-light bg-light rounded mb-4 px-3">
                 <a class="navbar-brand" href="/">Page Analyzer</a>
                 <div class="collapse navbar-collapse">
@@ -27,7 +28,7 @@
                     </ul>
                 </div>
             </nav>
-         </div>
+        </div>
 
         <div class="container mt-5">
             <h1 class="mb-4">Информация о сайте</h1>
@@ -43,7 +44,7 @@
                     <tr>
                         <td>${page.getUrl().getId()}</td>
                         <td>${page.getUrl().getName()}</td>
-                        <td>${page.getUrl().getFormattedCreatedAt()}</td>
+                        <td>${page.getUrl().getCreatedAt().format(formatter)}</td>
                     </tr>
                 </tbody>
             </table>
@@ -73,7 +74,7 @@
                             <td>${urlCheck.getTitle()}</td>
                             <td>${urlCheck.getH1()}</td>
                             <td>${urlCheck.getDescription()}</td>
-                            <td>${urlCheck.getFormattedCreatedAt()}</td>
+                            <td>${urlCheck.getCreatedAt().format(formatter)}</td>
                         </tr>
                     @endfor
                 </tbody>

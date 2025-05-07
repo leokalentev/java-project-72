@@ -30,7 +30,7 @@ public class UrlRepository extends BaseRepository {
     }
 
     public static List<Url> getEntities() throws SQLException {
-        var sql = "SELECT * FROM urls";
+        var sql = "SELECT * FROM urls ORDER BY created_at ASC";
         try (var conn = dataSource.getConnection();
              var stm = conn.prepareStatement(sql)) {
             var resultSet = stm.executeQuery();

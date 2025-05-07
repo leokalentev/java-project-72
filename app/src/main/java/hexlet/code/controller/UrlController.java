@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URL;
 
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
@@ -90,18 +91,18 @@ public class UrlController {
 
     public static void index(Context ctx) throws SQLException {
         var urls = UrlRepository.getEntities();
+        var lastChecks = UrlCheckRepository.getLastChecksForAllUrls();
+
         var page = new UrlsPage(urls);
+        page.setLastChecks(lastChecks);
 
-        for (var url : urls) {
-            var lastCheck = UrlCheckRepository.getLastCheckForUrl(url.getId());
-            page.setLastCheck(url.getId(), lastCheck);
-        }
+        var flash = ctx.consumeSessionAttribute("flash");
+        page.setFlash((String) flash);
 
-        var session = ctx.consumeSessionAttribute("flash");
-        page.setFlash((String) session);
-
-        ctx.render("urls.jte", model("page", page));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+        ctx.render("urls.jte", model("page", page, "formatter", formatter));
     }
+
 
     public static void show(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
@@ -116,7 +117,8 @@ public class UrlController {
 
         var checkPage = new UrlCheckPage(checks);
 
-        ctx.render("url.jte", model("page", page, "checkPage", checkPage));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+        ctx.render("url.jte", model("page", page, "checkPage", checkPage, "formatter", formatter));
     }
 
 
@@ -154,5 +156,4 @@ public class UrlController {
 
         show(ctx);
     }
-
 }

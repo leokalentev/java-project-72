@@ -4,9 +4,6 @@ import hexlet.code.model.Url;
 import hexlet.code.repository.UrlRepository;
 import io.javalin.Javalin;
 import io.javalin.testtools.JavalinTest;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,23 +16,11 @@ import java.sql.SQLException;
 
 public final class UrlTest {
     private Javalin app;
-    private static MockWebServer mockWebServer;
 
     @BeforeEach
     public void setUp() throws SQLException, IOException {
         app = App.getApp();
         UrlRepository.removeAll();
-    }
-
-    @BeforeAll
-    public static void startMock() throws IOException {
-        mockWebServer = new MockWebServer();
-        mockWebServer.start();
-    }
-
-    @AfterAll
-    public static void endMock() throws IOException {
-        mockWebServer.shutdown();
     }
 
     @Test

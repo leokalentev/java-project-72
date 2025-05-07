@@ -1,5 +1,7 @@
 @import hexlet.code.dto.urls.UrlsPage
+@import java.time.format.DateTimeFormatter
 @param UrlsPage page
+@param DateTimeFormatter formatter
 
 @template.layout.page(
     content = @`
@@ -28,9 +30,9 @@
                         <tr>
                             <td>${url.getId()}</td>
                             <td>${url.getName()}</td>
-                            <td>${url.getFormattedCreatedAt()}</td>
+                            <td>${url.getCreatedAt().format(formatter)}</td>
                             @if (page.getLastCheck(url.getId()) != null)
-                                <td>${page.getLastCheck(url.getId()).getFormattedCreatedAt()}</td>
+                                <td>${page.getLastCheck(url.getId()).getCreatedAt().format(formatter)}</td>
                                 <td>${page.getLastCheck(url.getId()).getStatusCode()}</td>
                             @else
                                 <td></td>
