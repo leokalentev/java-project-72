@@ -41,19 +41,20 @@ public class App {
 
         HikariConfig config = new HikariConfig();
 
-        String dbUrl = System.getenv("JDBC_DATABASE_URL");
-        if (dbUrl != null && !dbUrl.isEmpty()) {
-            config.setJdbcUrl(dbUrl);
-            config.setUsername(System.getenv("DB_USERNAME"));
-            config.setPassword(System.getenv("DB_PASSWORD"));
-
-        } else if ("production".equals(env)) {
-            throw new IllegalStateException("JDBC_DATABASE_URL must be set in production");
-
-        } else if ("test".equals(env)) {
-            config.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
+        if ("test".equals(env)) {
+            config.setJdbcUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;");
             config.setDriverClassName("org.h2.Driver");
+        } else if ("production".equals(env)) {
+            String dbUrl = System.getenv("JDBC_DATABASE_URL");
+            if (dbUrl == null || dbUrl.isEmpty()) {
+                throw new IllegalStateException("JDBC_DATABASE_URL must be set in production");
+            }
+            config.setJdbcUrl(dbUrl);
 
+            String username = System.getenv("DB_USERNAME");
+            String password = System.getenv("DB_PASSWORD");
+            if (username != null) config.setUsername(username);
+            if (password != null) config.setPassword(password);
         } else {
             config.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
             config.setDriverClassName("org.h2.Driver");
@@ -62,7 +63,7 @@ public class App {
         var dataSource = new HikariDataSource(config);
         BaseRepository.dataSource = dataSource;
 
-        if (!"production".equals(env)) {
+        if ("development".equals(env)) {
             var sql = readResourceFile("schema.sql");
             log.info("Initializing DB schema:\n{}", sql);
             try (var conn = dataSource.getConnection();
