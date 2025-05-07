@@ -53,8 +53,12 @@ public class App {
 
             String username = System.getenv("DB_USERNAME");
             String password = System.getenv("DB_PASSWORD");
-            if (username != null) config.setUsername(username);
-            if (password != null) config.setPassword(password);
+            if (username != null) {
+                config.setUsername(username);
+            }
+            if (password != null) {
+                config.setPassword(password);
+            }
         } else {
             config.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
             config.setDriverClassName("org.h2.Driver");
