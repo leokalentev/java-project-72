@@ -1,12 +1,12 @@
-@import java.time.format.DateTimeFormatter
 @import hexlet.code.dto.urls.UrlPage
 @import hexlet.code.dto.urls.UrlCheckPage
 @param UrlPage page
 @param UrlCheckPage checkPage
-@param DateTimeFormatter formatter
 
 @template.layout.page(
     content = @`
+        !{var formatter = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");}
+
         @if(page.getFlash() != null)
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 ${page.getFlash()}

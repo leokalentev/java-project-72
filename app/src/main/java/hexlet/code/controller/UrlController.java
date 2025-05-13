@@ -99,10 +99,8 @@ public class UrlController {
         var flash = ctx.consumeSessionAttribute("flash");
         page.setFlash((String) flash);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
-        ctx.render("urls.jte", model("page", page, "formatter", formatter));
+        ctx.render("urls.jte", model("page", page));
     }
-
 
     public static void show(Context ctx) throws SQLException {
         var id = ctx.pathParamAsClass("id", Long.class).get();
@@ -117,8 +115,7 @@ public class UrlController {
 
         var checkPage = new UrlCheckPage(checks);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
-        ctx.render("url.jte", model("page", page, "checkPage", checkPage, "formatter", formatter));
+        ctx.render("url.jte", model("page", page, "checkPage", checkPage));
     }
 
 

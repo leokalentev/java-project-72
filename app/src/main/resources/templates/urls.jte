@@ -1,10 +1,11 @@
 @import hexlet.code.dto.urls.UrlsPage
 @import java.time.format.DateTimeFormatter
 @param UrlsPage page
-@param DateTimeFormatter formatter
 
 @template.layout.page(
     content = @`
+        !{var formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");}
+
         @if(page.getFlash() != null)
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 ${page.getFlash()}
@@ -27,13 +28,14 @@
                 </thead>
                 <tbody>
                     @for (var url : page.getUrls())
+                        !{var lastCheck = page.getLastCheck(url.getId());}
                         <tr>
                             <td>${url.getId()}</td>
                             <td>${url.getName()}</td>
                             <td>${url.getCreatedAt().format(formatter)}</td>
-                            @if (page.getLastCheck(url.getId()) != null)
-                                <td>${page.getLastCheck(url.getId()).getCreatedAt().format(formatter)}</td>
-                                <td>${page.getLastCheck(url.getId()).getStatusCode()}</td>
+                            @if (lastCheck != null)
+                                <td>${lastCheck.getCreatedAt().format(formatter)}</td>
+                                <td>${lastCheck.getStatusCode()}</td>
                             @else
                                 <td></td>
                                 <td></td>

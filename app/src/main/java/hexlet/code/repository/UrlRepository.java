@@ -50,7 +50,7 @@ public class UrlRepository extends BaseRepository {
     }
 
     public static boolean getNames(String value) throws SQLException {
-        var sql = "SELECT name FROM urls";
+        var sql = "SELECT name FROM urls ORDER BY name";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             var resultSet = stmt.executeQuery();
