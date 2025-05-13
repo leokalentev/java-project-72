@@ -20,7 +20,6 @@ import java.net.URI;
 import java.net.URL;
 
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static io.javalin.rendering.template.TemplateUtil.model;
